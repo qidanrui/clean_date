@@ -896,26 +896,7 @@ def figure_target_format_hms(parsed_data: Union[parsed_target_format, Any],
                not token in AM and not token in PM:
                 remain_str = token
 
-        hms_tokens = []
-        if 'z' in remain_str:
-            parsed_data.timezone_token = 'z'
-            hms_tokens = split(remain_str, [":", parsed_data.timezone_token])
-        elif 'Z' in remain_str:
-            parsed_data.timezone_token = 'Z'
-            hms_tokens = split(remain_str, [":", parsed_data.timezone_token])
-        else:
-            hms_tokens = split(remain_str, [":"])
-        # ensure AM, PM tokens without JUMP seperators
-        for token in AM:
-            if token in remain_str:
-                hms_tokens = split(remain_str, AM)
-                break
-        for token in PM:
-            if token in remain_str:
-                hms_tokens = split(remain_str, PM)
-                break
-        if len(hms_tokens) == 0:
-            hms_tokens = split(remain_str, [":"])
+        parsed_data, hms_tokens = get_target_format_hms_tokens(parsed_data, remain_str)
 
         for token in hms_tokens:
             if token in TARGET_HOUR:
@@ -928,6 +909,40 @@ def figure_target_format_hms(parsed_data: Union[parsed_target_format, Any],
             remain_tokens.remove(remain_str)
 
     return parsed_data, remain_tokens
+
+def get_target_format_hms_tokens(parsed_data: Union[parsed_target_format, Any],
+                                 remain_str: Union[str, Any]) -> Any:
+    """
+    This function get hour, minute and second token in target format
+    Parameters
+    ----------
+    parsed_data
+        paresed target format
+    remain_str
+        remained string after figuring tokens
+    """
+
+    if 'z' in remain_str:
+        parsed_data.timezone_token = 'z'
+        hms_tokens = split(remain_str, [":", parsed_data.timezone_token])
+    elif 'Z' in remain_str:
+        parsed_data.timezone_token = 'Z'
+        hms_tokens = split(remain_str, [":", parsed_data.timezone_token])
+    else:
+        hms_tokens = split(remain_str, [":"])
+    # ensure AM, PM tokens without JUMP seperators
+    for token in AM:
+        if token in remain_str:
+            hms_tokens = split(remain_str, AM)
+            break
+    for token in PM:
+        if token in remain_str:
+            hms_tokens = split(remain_str, PM)
+            break
+    if len(hms_tokens) == 0:
+        hms_tokens = split(remain_str, [":"])
+
+    return parsed_data, hms_tokens
 
 def ensure_ymd(tokes: Union[str, Any]) -> Any:
     """
